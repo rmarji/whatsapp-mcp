@@ -24,6 +24,7 @@ import (
 
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
+	"go.mau.fi/whatsmeow/store"
 	"go.mau.fi/whatsmeow/store/sqlstore"
 	"go.mau.fi/whatsmeow/types"
 	"go.mau.fi/whatsmeow/types/events"
@@ -790,6 +791,13 @@ func main() {
 	// Set up logger
 	logger := waLog.Stdout("Client", "INFO", true)
 	logger.Infof("Starting WhatsApp client...")
+
+	// Request a FULL history sync instead of WhatsApp's default recent
+	// (~3-month) window. Only takes effect on a fresh pairing (re-scan the QR);
+	// the amount actually delivered is still bounded by what the phone retains.
+	store.DeviceProps.RequireFullSync = proto.Bool(true)
+	store.DeviceProps.HistorySyncConfig.FullSyncDaysLimit = proto.Uint32(3650)
+	store.DeviceProps.HistorySyncConfig.FullSyncSizeMbLimit = proto.Uint32(2048)
 
 	// Create database connection for storing session data
 	dbLog := waLog.Stdout("Database", "INFO", true)
