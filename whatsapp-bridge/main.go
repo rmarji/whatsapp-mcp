@@ -871,6 +871,10 @@ func main() {
 			if evt.Event == "code" {
 				fmt.Println("\nScan this QR code with your WhatsApp app:")
 				qrterminal.GenerateHalfBlock(evt.Code, qrterminal.L, os.Stdout)
+				if os.Getenv("WA_PRINT_QR_RAW") != "" {
+					// Emit the raw pairing code so tooling (whatsapp-reauth) can render a scannable image.
+					fmt.Println("QR_CODE_RAW:" + evt.Code)
+				}
 			} else if evt.Event == "success" {
 				connected <- true
 				break
